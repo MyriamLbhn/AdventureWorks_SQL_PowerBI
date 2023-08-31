@@ -14,10 +14,12 @@
 
 7. Remplissez les détails de base, puis choisissez "Other registry" comme source d'image.
 
-8. Pour le champ "Image name", entrez le nom complet de l'image que vous avez poussée sur Docker Hub.
+8. Pour le champ "Image", entrez le nom complet de l'image que vous avez poussée sur Docker Hub.
 
-9. Configurez le port du conteneur en utilisant le port 1433 (celui que vous avez défini pour SQL Server).
+9. Changer la taille par défaut (1.5 Gio) à 4 Gio
 
-10. Révisez et validez les paramètres, puis cliquez sur "Review + create" pour créer l'instance de conteneur.
+10. Configurez le port du conteneur en utilisant le port 1433 (celui que vous avez défini pour SQL Server).
 
-11. Une fois l'instance de conteneur déployée sur Azure, accédez à la vue d'ensemble de l'instance. Vous y trouverez l'adresse IP publique à utiliser pour vous connecter à la base de données. Utilisez cette adresse IP à la place de "localhost" pour vous connecter depuis vos outils SQL.
+11. Révisez et validez les paramètres, puis cliquez sur "Review + create" pour créer l'instance de conteneur.
+
+12. Une fois l'instance de conteneur déployée sur Azure, accédez à la vue d'ensemble de l'instance. Vous y trouverez l'adresse IP publique à utiliser pour vous connecter à la base de données. Utilisez cette adresse IP à la place de "localhost" pour vous connecter depuis vos outils SQL.
