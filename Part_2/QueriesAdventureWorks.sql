@@ -182,8 +182,8 @@ Sort the result in ascending order on year part of order date.*/
 
 SELECT DATEPART(year, OrderDate) AS Year, SUM(TotalDue) AS TotalDueAmount
 FROM AdventureWorks2019.Sales.SalesOrderHeader
+WHERE  DATEPART(year, OrderDate) <= 2016
 GROUP BY DATEPART(year,OrderDate)
-HAVING DATEPART(year,OrderDate) <= 2016
 ORDER BY Year;
 
 -- Query 19:
@@ -288,6 +288,15 @@ SELECT SalesOrderID, ProductID, OrderQty,
 FROM AdventureWorks2019.Sales.SalesOrderDetail
 WHERE SalesOrderID IN(43659,43664);
 
+WITH aggregats(salesorderid, total_quantity, avg_quantity, nooforders, minquantity, maxquantity)
+AS 
+(SELECT salesorderid, SUM(OrderQty) as totalquantity, avg(OrderQty) as avg_quantity, count(OrderQty)as nooforders, min(orderqty) as minquantity, max(orderqty) as maxquantity
+FROM AdventureWorks2019.Sales.SalesOrderDetail
+GROUP BY SalesOrderID)
+SELECT a.salesorderid, productid, orderqty, total_quantity, avg_quantity, nooforders,minquantity, maxquantity
+FROM aggregats as a
+JOIN AdventureWorks2019.sales.SalesOrderDetail as s ON a.salesorderid = s.SalesOrderID
+WHERE s.SalesOrderID IN (43659,43664);
 
 -- Query 26:
 /* From the table Sales.SalesOrderDetail write a query in SQL to find the sum, average, and 
@@ -366,15 +375,15 @@ ORDER BY CASE WHEN SalariedFlag = 'true' THEN BusinessEntityID END DESC
         ,CASE SalariedFlag WHEN 'false' THEN BusinessEntityID END;
 
 -- Query 33:
-/* From the table Sales.SalesPerson write a query in SQL to set the result in order by the column 
+/* From the table Sales.vSalesPerson write a query in SQL to set the result in order by the column 
 TerritoryName when the column CountryRegionName is equal to 'United States' and by CountryRegionName 
 for all other rows.*/
 
-SELECT p.BusinessEntityID, t.Name, t.CountryRegionCode
-FROM AdventureWorks2019.Sales.SalesPerson AS p
-JOIN AdventureWorks2019.Sales.SalesTerritory AS t 
-    ON p.TerritoryID = t.TerritoryID
-ORDER BY CASE t.CountryRegionCode WHEN 'US' THEN t.Name ELSE t.CountryRegionCode END;
+SELECT BusinessEntityID, LastName, TerritoryName, CountryRegionName  
+FROM AdventureWorks2019.Sales.vSalesPerson  
+WHERE TerritoryName IS NOT NULL  
+ORDER BY CASE WHEN CountryRegionName='United States' THEN TerritoryName  
+         ELSE CountryRegionName END;
 
 
 -- Query 34:
@@ -573,7 +582,7 @@ AS
     WHERE SalesPersonID IS NOT NULL
     GROUP BY SalesPersonID
 )
-SELECT AVG(NumberOfOrders) AS "Average Sales Per Person"
+SELECT AVG(NumberOfOrders) AS "AverageSalesPerPerson"
 FROM Sales_CTE;
 
 /* CTE stands for "Common Table Expression." It is a temporary expression in a SQL query that allows 
@@ -586,7 +595,7 @@ green_ in the LargePhotoFileName field. The following table's columns must all b
 
 SELECT *   
 FROM AdventureWorks2019.Production.ProductPhoto  
-WHERE LargePhotoFileName LIKE '%green_%' ;
+WHERE LargePhotoFileName LIKE '%greena_%' ESCAPE 'a' ;
 
 -- Query 49:
 /* From the tables Person.Address and Person.StateProvince write a SQL query to retrieve the 
@@ -597,7 +606,7 @@ SELECT AddressLine1, AddressLine2, City, PostalCode, CountryRegionCode
 FROM AdventureWorks2019.Person.Address AS a  
 JOIN AdventureWorks2019.Person.StateProvince AS s 
     ON a.StateProvinceID = s.StateProvinceID  
-WHERE CountryRegionCode NOT IN ('US') AND City LIKE 'Pa%' ;
+WHERE CountryRegionCode <> 'US' AND City LIKE 'Pa%' ;
 
 -- Query 50:
 /* From the table HumanResources.Employee write a query in SQL to fetch first twenty rows. 
