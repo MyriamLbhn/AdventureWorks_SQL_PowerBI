@@ -298,12 +298,12 @@ quantity.*/
 SELECT SalesOrderID, ProductID, OrderQty, 
        SUM(OrderQty) OVER (PARTITION BY SalesOrderID) AS TotalQuantity, 
        AVG(OrderQty) OVER (PARTITION BY SalesOrderID) AS AvgQuantity,
-       COUNT(OrderQty) OVER (PARTITION BY SalesOrderID) AS NoOfOrders, 
-       MAX(OrderQty) OVER (PARTITION BY SalesOrderID) AS MaxQuantity, 
-       MIN(OrderQty) OVER (PARTITION BY SalesOrderID) AS MinQuantity
+       COUNT(OrderQty) OVER (PARTITION BY SalesOrderID) AS NoOfOrders
 FROM AdventureWorks2019.Sales.SalesOrderDetail
 WHERE SalesOrderID IN(43659,43664) AND ProductID LIKE '71%';
 
+/* Employing SUM() OVER() and other window functions is relevant when you want to obtain aggregations 
+while retaining details of each individual row*/
 
 -- Query 27:
 /*  From the table Sales.SalesOrderDetail write a query in SQL to retrieve the total cost of each 
@@ -396,6 +396,24 @@ FROM AdventureWorks2019.Sales.SalesPerson AS s
         ON a.AddressID = p.BusinessEntityID  
 WHERE TerritoryID IS NOT NULL AND SalesYTD <> 0;
 
+/*Explanation of the analytic functions:
+
+The ROW_NUMBER() function assigns a unique number to each record in the result set.
+The numbering starts from 1 and increments for each new record.
+It is used to create a sequence of unique numbers in the result.
+
+The RANK() function assigns a rank to each record based on the order of values specified in the ORDER BY clause.
+Records with equal values are given the same rank, and the next rank is skipped.
+For example, if two records have the same ranking, the next ranking is skipped, meaning there is no ranking equal to it.
+
+The DENSE_RANK() function also assigns a rank based on the order of values in the ORDER BY clause.
+However, unlike RANK(), records with equal values are given the same rank, and the next rank is not skipped.
+There are no gaps in the sequence of ranks.
+
+The NTILE(n) function divides records into approximately equal-sized "n" groups based on the order of values.
+Each group contains a similar number of records as closely as possible.
+For example, NTILE(4) divides records into 4 groups of similar size.*/
+
 -- Query 35:
 /* From the table  HumanResources.Department write a query in SQL to skip the first 10 rows from 
 the sorted result set and return all remaining rows.*/
@@ -471,7 +489,7 @@ RIGHT OUTER JOIN AdventureWorks2019.Sales.SalesPerson AS p
 the Person.Person, HumanResources.Employee, Person.Address and Person.BusinessEntityAddress tables. 
 Order the result set on lastname then by firstname.*/
 
-SELECT concat(RTRIM(p.FirstName),' ', LTRIM(p.LastName)) AS Name, d.City  
+SELECT concat(RTRIM(p.FirstName),' ', LTRIM(p.LastName)) AS Name, DerivatedTable.City  
 FROM AdventureWorks2019.Person.Person AS p  
 INNER JOIN AdventureWorks2019.HumanResources.Employee AS e 
     ON p.BusinessEntityID = e.BusinessEntityID   
@@ -479,8 +497,8 @@ INNER JOIN
    (SELECT bea.BusinessEntityID, a.City   
     FROM AdventureWorks2019.Person.Address AS a  
     INNER JOIN AdventureWorks2019.Person.BusinessEntityAddress AS bea  
-        ON a.AddressID = bea.AddressID) AS d  
-ON p.BusinessEntityID = d.BusinessEntityID  
+        ON a.AddressID = bea.AddressID) AS DerivatedTable  
+ON p.BusinessEntityID = DerivatedTable.BusinessEntityID  
 ORDER BY p.LastName, p.FirstName;
 
 -- Query 43:
@@ -550,13 +568,17 @@ orders for all the years of the sales representatives.
 WITH Sales_CTE (SalesPersonID, NumberOfOrders)
 AS
 (
-    SELECT SalesPersonID, COUNT(*)
+    SELECT SalesPersonID, COUNT(*) AS NumberOfOrders
     FROM AdventureWorks2019.Sales.SalesOrderHeader
     WHERE SalesPersonID IS NOT NULL
     GROUP BY SalesPersonID
 )
 SELECT AVG(NumberOfOrders) AS "Average Sales Per Person"
 FROM Sales_CTE;
+
+/* CTE stands for "Common Table Expression." It is a temporary expression in a SQL query that allows 
+defining a virtual table to be used in the main query. It simplifies and makes SQL code more readable, 
+especially when complex or repetitive operations need to be performed.*/
 
 -- Query 48:
 /* Write a SQL query on the table Production.ProductPhoto to retrieve records with the characters 
